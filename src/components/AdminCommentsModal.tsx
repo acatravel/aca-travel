@@ -13,7 +13,8 @@ import {
   MapPin,
   Image as ImageIcon,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Loader2
 } from 'lucide-react';
 import { useTestimonials } from '../context/TestimonialsContext';
 import { useAdmin } from '../context/AdminContext';
@@ -41,6 +42,7 @@ export function AdminCommentsModal() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [previewPhotoUrl, setPreviewPhotoUrl] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
   // If there's a targetEditingTestimonial triggered from outside (e.g. from the carousel)
   React.useEffect(() => {
@@ -56,31 +58,63 @@ export function AdminCommentsModal() {
     setTimeout(() => setToastMessage(null), 3500);
   };
 
-  const handleApprove = (id: string) => {
-    approveTestimonial(id);
-    showToast('✅ Comentario aprobado y publicado en el sitio');
-  };
-
-  const handleDecline = (id: string) => {
-    declineTestimonial(id);
-    showToast('⚠️ Comentario declinado (oculto para visitantes)');
-  };
-
-  const handleDelete = () => {
-    if (deletingId) {
-      deleteTestimonial(deletingId);
-      setDeletingId(null);
-      showToast('🗑️ Comentario eliminado permanentemente');
+  const handleApprove = async (id: string) => {
+    setIsSaving(true);
+    try {
+      await approveTestimonial(id);
+      showToast('✅ Comentario aprobado y guardado en base de datos');
+    } catch (e) {
+      console.error(e);
+      showToast('⚠️ Error al sincronizar con la base de datos');
+    } finally {
+      setIsSaving(false);
     }
   };
 
-  const handleSaveEdit = (e: React.FormEvent) => {
+  const handleDecline = async (id: string) => {
+    setIsSaving(true);
+    try {
+      await declineTestimonial(id);
+      showToast('⚠️ Comentario declinado y guardado en base de datos');
+    } catch (e) {
+      console.error(e);
+      showToast('⚠️ Error al sincronizar con la base de datos');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (deletingId) {
+      setIsSaving(true);
+      try {
+        await deleteTestimonial(deletingId);
+        showToast('🗑️ Comentario eliminado permanentemente de la base de datos');
+      } catch (e) {
+        console.error(e);
+        showToast('⚠️ Error al eliminar de la base de datos');
+      } finally {
+        setIsSaving(false);
+        setDeletingId(null);
+      }
+    }
+  };
+
+  const handleSaveEdit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingItem) return;
-    updateTestimonial(editingItem);
-    setEditingItem(null);
-    setTargetEditingTestimonial(null);
-    showToast('💾 Comentario actualizado exitosamente');
+    setIsSaving(true);
+    try {
+      await updateTestimonial(editingItem);
+      showToast('💾 Comentario actualizado exitosamente en base de datos');
+    } catch (e) {
+      console.error(e);
+      showToast('⚠️ Error al guardar en la base de datos');
+    } finally {
+      setIsSaving(false);
+      setEditingItem(null);
+      setTargetEditingTestimonial(null);
+    }
   };
 
   const filteredTestimonials = testimonials.filter((t) => {
@@ -102,6 +136,8 @@ export function AdminCommentsModal() {
   const countApproved = testimonials.filter((t) => !t.status || t.status === 'approved').length;
   const countDeclined = testimonials.filter((t) => t.status === 'declined').length;
 
+  if (!isCommentsModalOpen) return null;
+
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/85 backdrop-blur-xl flex items-center justify-center p-3 sm:p-6 animate-fadeInScale">
       {/* Toast Notification */}
@@ -109,6 +145,14 @@ export function AdminCommentsModal() {
         <div className="fixed top-6 right-6 z-50 px-5 py-3 rounded-2xl bg-emerald-500 text-white font-bold text-sm shadow-2xl flex items-center gap-2 animate-slide-right">
           <Check className="w-5 h-5" />
           <span>{toastMessage}</span>
+        </div>
+      )}
+
+      {/* Sincronizando Indicator */}
+      {isSaving && (
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-slate-900 border border-amber-400 text-amber-300 text-xs font-bold flex items-center gap-2 shadow-2xl animate-pulse">
+          <Loader2 className="w-4 h-4 animate-spin text-amber-400" />
+          <span>Sincronizando con Neon PostgreSQL...</span>
         </div>
       )}
 

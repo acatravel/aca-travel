@@ -213,7 +213,7 @@ export function ReviewsAndFeedback() {
     setCurrentStep(2);
   };
 
-  const handleSubmitReview = (e: React.FormEvent) => {
+  const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.comment.trim()) {
       alert('Por favor escribe tu comentario o experiencia.');
@@ -221,7 +221,7 @@ export function ReviewsAndFeedback() {
     }
 
     setIsSubmitting(true);
-    setTimeout(() => {
+    try {
       const fallbackQuote =
         formData.quote.trim() ||
         formData.comment.slice(0, 70) + (formData.comment.length > 70 ? '...' : '');
@@ -243,9 +243,8 @@ export function ReviewsAndFeedback() {
         createdAt: Date.now(),
       };
 
-      addTestimonial(newReview);
+      await addTestimonial(newReview);
       setCurrentIndex(0);
-      setIsSubmitting(false);
       setShowSuccessToast(true);
       setCurrentStep(1);
 
@@ -270,7 +269,12 @@ export function ReviewsAndFeedback() {
       }
 
       setTimeout(() => setShowSuccessToast(false), 4000);
-    }, 450);
+    } catch (err) {
+      console.error('Error submitting review to database:', err);
+      alert(language === 'es' ? 'Error al guardar el testimonio en la base de datos' : 'Error saving testimonial to database');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

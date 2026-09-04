@@ -1,13 +1,22 @@
 import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 
 // https://vite.dev/config/
-export default defineConfig({
-  plugins: [react()],
-  resolve: {
-    dedupe: ['react', 'react-dom'],
-  },
-  optimizeDeps: {
-    include: ['react', 'react-dom', 'lucide-react'],
-  },
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
+  const dbUrl = env.Database_URL || env.DATABASE_URL || env.VITE_DATABASE_URL || ''
+
+  return {
+    plugins: [react()],
+    define: {
+      'import.meta.env.VITE_DATABASE_URL': JSON.stringify(dbUrl),
+      'process.env.DATABASE_URL': JSON.stringify(dbUrl),
+    },
+    resolve: {
+      dedupe: ['react', 'react-dom'],
+    },
+    optimizeDeps: {
+      include: ['react', 'react-dom', 'lucide-react'],
+    },
+  }
 })

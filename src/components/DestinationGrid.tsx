@@ -1,6 +1,19 @@
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useMemo } from 'react';
 import type { Destination } from '../types';
-import { MessageCircle, ArrowRight, Clock, Sparkles, ChevronLeft, ChevronRight, Edit3, Trash2, Building2 } from 'lucide-react';
+import { 
+  MessageCircle, 
+  Clock, 
+  Sparkles, 
+  ChevronLeft, 
+  ChevronRight, 
+  Edit3, 
+  Trash2, 
+  Building2,
+  CheckCircle2,
+  Check,
+  Eye,
+  Star
+} from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useDestinations } from '../context/DestinationsContext';
 import { useAdmin } from '../context/AdminContext';
@@ -19,7 +32,7 @@ export function DestinationGrid({
   onSelectDestination,
 }: DestinationGridProps) {
   const { language } = useLanguage();
-  const { destinations, categories, deleteDestination } = useDestinations();
+  const { destinations, categories, isLoading, deleteDestination } = useDestinations();
   const { isAdmin, setIsPackagesModalOpen, setTargetEditingDestination } = useAdmin();
   const [isPending, startTransition] = useTransition();
   const [isSimulatedLoading, setIsSimulatedLoading] = useState(false);
@@ -89,9 +102,106 @@ export function DestinationGrid({
     }, 1100);
   };
 
-  const filtered = selectedCategory.toLowerCase() === 'todos'
-    ? destinations
-    : destinations.filter((d) => d.category.toLowerCase() === selectedCategory.toLowerCase());
+  const filtered = useMemo(() => {
+    const catLower = selectedCategory.toLowerCase().trim();
+    if (catLower === 'todos' || !catLower) {
+      return destinations;
+    }
+
+    // 1. Resorts filter ("Resorts/RD", "resorts", "resort", "escapadas-rd")
+    if (
+      catLower === 'escapadas-rd' ||
+      catLower === 'resorts' ||
+      catLower === 'resort' ||
+      catLower.includes('resort')
+    ) {
+      return destinations.filter((d) =>
+        d.isResort === true ||
+        d.category.toLowerCase() === 'escapadas-rd' ||
+        d.category.toLowerCase() === 'resorts' ||
+        d.category.toLowerCase() === 'resort' ||
+        d.title.toLowerCase().includes('resort') ||
+        (d.tagline && d.tagline.toLowerCase().includes('resort')) ||
+        (d.badge && d.badge.toLowerCase().includes('resort'))
+      );
+    }
+
+    // 2. conocerRD / República Dominicana trips
+    if (
+      catLower === 'conocerrd' ||
+      catLower === 'rd' ||
+      catLower.includes('conocer') ||
+      catLower.includes('dominican')
+    ) {
+      return destinations.filter((d) =>
+        d.category.toLowerCase() === 'conocerrd' ||
+        d.category.toLowerCase() === 'escapadas-rd' ||
+        d.id.toLowerCase().includes('rd') ||
+        d.id.toLowerCase().includes('samana') ||
+        d.id.toLowerCase().includes('punta-cana') ||
+        d.id.toLowerCase().includes('macao') ||
+        d.title.toLowerCase().includes('samaná') ||
+        d.title.toLowerCase().includes('punta cana') ||
+        d.title.toLowerCase().includes('dominicana')
+      );
+    }
+
+    // 3. México
+    if (catLower === 'mexico' || catLower.includes('mexic')) {
+      return destinations.filter((d) =>
+        d.category.toLowerCase() === 'mexico' ||
+        d.title.toLowerCase().includes('méxico') ||
+        d.title.toLowerCase().includes('cancún') ||
+        d.title.toLowerCase().includes('riviera maya')
+      );
+    }
+
+    // 4. Colombia
+    if (catLower === 'colombia' || catLower.includes('colomb')) {
+      return destinations.filter((d) =>
+        d.category.toLowerCase() === 'colombia' ||
+        d.title.toLowerCase().includes('colombia') ||
+        d.title.toLowerCase().includes('medellín') ||
+        d.title.toLowerCase().includes('cartagena') ||
+        d.title.toLowerCase().includes('guatapé')
+      );
+    }
+
+    // 5. Cruceros
+    if (catLower === 'cruceros' || catLower.includes('crucero')) {
+      return destinations.filter((d) =>
+        d.category.toLowerCase() === 'cruceros' ||
+        d.experienceType === 'cruise' ||
+        d.title.toLowerCase().includes('crucero') ||
+        (d.badge && d.badge.toLowerCase().includes('crucero'))
+      );
+    }
+
+    // 6. Europa
+    if (catLower === 'europa' || catLower.includes('europ')) {
+      return destinations.filter((d) =>
+        d.category.toLowerCase() === 'europa' ||
+        d.title.toLowerCase().includes('europa') ||
+        d.title.toLowerCase().includes('madrid') ||
+        d.title.toLowerCase().includes('roma') ||
+        d.title.toLowerCase().includes('parís')
+      );
+    }
+
+    // 7. Japón
+    if (catLower === 'japon' || catLower.includes('japon') || catLower.includes('japón')) {
+      return destinations.filter((d) =>
+        d.category.toLowerCase() === 'japon' ||
+        d.title.toLowerCase().includes('japón') ||
+        d.title.toLowerCase().includes('japon') ||
+        d.title.toLowerCase().includes('tokio') ||
+        d.title.toLowerCase().includes('kioto')
+      );
+    }
+
+    // Default: match by category ID
+    return destinations.filter((d) => d.category.toLowerCase() === catLower);
+  }, [destinations, selectedCategory]);
 
   return (
     <section id="destinos" className="py-10 sm:py-14 lg:py-16 relative">
@@ -215,7 +325,7 @@ export function DestinationGrid({
         </div>
 
         {/* Dynamic Grid of Clean Glassmorphism Cards with Loading Effect */}
-        {isSimulatedLoading || isPending ? (
+        {isLoading || isSimulatedLoading || isPending ? (
           <DestinationSkeleton />
         ) : filtered.length === 0 ? (
           <div className="text-center py-16 px-6 glass-card-luxury rounded-3xl max-w-lg mx-auto space-y-4 animate-fadeInScale">
@@ -246,6 +356,7 @@ export function DestinationGrid({
               const duration = language === 'en' && destination.durationEn ? destination.durationEn : destination.duration;
               const price = language === 'en' && destination.priceEstimateEn ? destination.priceEstimateEn : destination.priceEstimate;
               const initialPay = language === 'en' && destination.initialPaymentEn ? destination.initialPaymentEn : destination.initialPayment;
+              const catObj = categories.find((c) => c.id.toLowerCase() === destination.category.toLowerCase());
 
               const whatsappMessage =
                 language === 'es'
@@ -256,20 +367,27 @@ export function DestinationGrid({
               return (
                 <div
                   key={destination.id}
-                  className="group glass-card-luxury rounded-3xl overflow-hidden transition-all duration-300 flex flex-col justify-between hover:-translate-y-2 animate-fadeInScale"
+                  className="group relative rounded-3xl overflow-hidden glass-card-luxury border border-white/90 hover:border-amber-400/60 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl flex flex-col justify-between animate-fadeInScale"
                 >
-                  {/* Photo Container */}
-                  <div className="relative h-60 w-full overflow-hidden bg-slate-900">
+                  {/* Subtle Golden Ambient Edge on Hover */}
+                  <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-amber-400 via-terracotta-500 to-amber-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-30 pointer-events-none" />
+
+                  {/* Visual Photographic Header */}
+                  <div className="relative h-64 w-full overflow-hidden bg-slate-900">
                     <img
                       src={destination.image}
                       alt={title}
                       loading="lazy"
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-108"
                     />
+
+                    {/* Gradient Vignette Overlays */}
+                    <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/70 via-black/20 to-transparent pointer-events-none" />
+                    <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/80 via-black/30 to-transparent pointer-events-none" />
 
                     {/* Admin Quick Controls */}
                     {isAdmin && (
-                      <div className="absolute top-3.5 left-3.5 z-20 flex items-center gap-1.5 bg-slate-950/85 backdrop-blur-md px-2.5 py-1 rounded-full border border-amber-400/50 shadow-lg">
+                      <div className="absolute top-3.5 left-3.5 z-30 flex items-center gap-1.5 bg-slate-950/90 backdrop-blur-md px-2.5 py-1 rounded-full border border-amber-400/50 shadow-lg">
                         <button
                           type="button"
                           onClick={(e) => {
@@ -286,10 +404,14 @@ export function DestinationGrid({
                         <span className="text-slate-600">|</span>
                         <button
                           type="button"
-                          onClick={(e) => {
+                          onClick={async (e) => {
                             e.stopPropagation();
                             if (window.confirm(`¿Eliminar paquete "${destination.title}"?`)) {
-                              deleteDestination(destination.id);
+                              try {
+                                await deleteDestination(destination.id);
+                              } catch (err) {
+                                alert('Error al eliminar de la base de datos');
+                              }
                             }
                           }}
                           className="text-[10px] font-bold text-rose-400 hover:text-rose-200 flex items-center gap-1 cursor-pointer transition-colors"
@@ -300,101 +422,150 @@ export function DestinationGrid({
                       </div>
                     )}
 
-                    {/* Duration or Resort Badge */}
-                    <div className="absolute top-3.5 right-3.5 flex items-center gap-1.5">
-                      {destination.isResort && (
-                        <span className="px-2.5 py-1 rounded-full bg-cyan-500/90 backdrop-blur-md text-[10px] font-black text-slate-950 flex items-center gap-1 shadow-md">
-                          <Building2 className="w-3 h-3" /> Resort
-                        </span>
-                      )}
-                      <div className="px-3 py-1 rounded-full bg-slate-950/75 backdrop-blur-md text-[11px] font-bold text-white flex items-center gap-1 shadow-md border border-white/10">
-                        <Clock className="w-3 h-3 text-amber-300" />
+                    {/* Top Floating Badges */}
+                    <div className="absolute top-3.5 inset-x-3.5 z-20 flex items-center justify-between gap-2 pointer-events-none">
+                      {/* Left: Category or Resort Badge */}
+                      <div>
+                        {destination.isResort ? (
+                          <span className="px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 shadow-md">
+                            <Building2 className="w-3 h-3" /> Resort 5⭐ All-Inclusive
+                          </span>
+                        ) : destination.badge ? (
+                          <span className="px-3 py-1 rounded-full bg-slate-950/85 backdrop-blur-md border border-amber-400/40 text-amber-300 text-[10px] font-bold flex items-center gap-1 shadow-md">
+                            {destination.badge}
+                          </span>
+                        ) : (
+                          <span className="px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold flex items-center gap-1 shadow-md">
+                            <span>{catObj?.emoji || '✈️'}</span>
+                            <span>{catObj?.label || 'Destino'}</span>
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Right: Duration Badge */}
+                      <div className="px-3 py-1 rounded-full bg-slate-950/85 backdrop-blur-md border border-white/20 text-white text-[11px] font-bold flex items-center gap-1.5 shadow-md">
+                        <Clock className="w-3.5 h-3.5 text-amber-400" />
                         <span>{duration}</span>
                       </div>
                     </div>
 
-                    {/* Visa / Flexibility Tag */}
-                    <div className="absolute bottom-3.5 left-3.5 right-3.5 flex items-center justify-between gap-2">
-                      <span className="inline-block text-[10px] font-bold px-2.5 py-1 rounded-lg bg-slate-950/85 text-white backdrop-blur-md shadow-md border border-white/10 truncate">
-                        {language === 'en' && destination.visaRequirementEn ? destination.visaRequirementEn : destination.visaRequirement}
+                    {/* Bottom Floating Badges on Photo */}
+                    <div className="absolute bottom-3.5 inset-x-3.5 z-20 flex items-center justify-between gap-2 pointer-events-none">
+                      <span className="inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1 rounded-lg bg-emerald-950/90 text-emerald-300 backdrop-blur-md border border-emerald-500/30 shadow-md truncate max-w-[210px]">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-400 flex-shrink-0" />
+                        <span className="truncate">
+                          {language === 'en' && destination.visaRequirementEn ? destination.visaRequirementEn : destination.visaRequirement}
+                        </span>
                       </span>
+
                       {destination.roomType && (
-                        <span className="inline-block text-[10px] font-bold px-2.5 py-1 rounded-lg bg-cyan-950/85 text-cyan-200 backdrop-blur-md shadow-md border border-cyan-400/20 truncate">
+                        <span className="inline-block text-[10px] font-bold px-2.5 py-1 rounded-lg bg-sky-950/90 text-sky-200 backdrop-blur-md border border-sky-400/25 shadow-md truncate max-w-[160px]">
                           {destination.roomType}
                         </span>
                       )}
                     </div>
                   </div>
 
-                  {/* Card Content with Clean Typography & High Contrast */}
-                  <div className="p-6 sm:p-7 flex-1 flex flex-col justify-between space-y-4">
-                    <div className="space-y-2">
-                      <h3 className="font-display text-xl font-black text-slate-900 tracking-tight leading-snug group-hover:text-terracotta-600 transition-colors">
+                  {/* Card Content with Clean Typography & Organized Information */}
+                  <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between space-y-4">
+                    <div className="space-y-2.5">
+                      {/* Micro Category & Rating Bar */}
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-amber-600 flex items-center gap-1">
+                          <span>{catObj?.emoji || '✨'}</span>
+                          <span>{catObj?.label || destination.category.toUpperCase()}</span>
+                        </span>
+                        <span className="text-[11px] font-bold text-slate-500 flex items-center gap-1">
+                          <Star className="w-3 h-3 fill-amber-400 text-amber-400" /> 4.9
+                        </span>
+                      </div>
+
+                      {/* Main Title */}
+                      <h3
+                        onClick={() => onSelectDestination(destination)}
+                        className="font-display text-lg sm:text-xl font-black text-slate-900 group-hover:text-terracotta-600 transition-colors tracking-tight line-clamp-1 leading-snug cursor-pointer"
+                        title={title}
+                      >
                         {title}
                       </h3>
-                      <p className="text-xs text-slate-600 font-normal leading-relaxed line-clamp-2">
-                        {language === 'en' && destination.descriptionEn ? destination.descriptionEn : destination.description}
+
+                      {/* Tagline / Brief Description */}
+                      <p className="text-xs text-slate-600 font-normal leading-relaxed line-clamp-2 min-h-[32px]">
+                        {destination.tagline || (language === 'en' && destination.descriptionEn ? destination.descriptionEn : destination.description)}
                       </p>
 
-                      {/* Chips de lo que CONTIENE el paquete turístico o resort */}
+                      {/* Clean Organized Feature Pills */}
                       <div className="flex flex-wrap gap-1.5 pt-1">
                         {destination.mealPlan && (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-amber-50 text-amber-900 border border-amber-200">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-amber-50 text-amber-900 border border-amber-200/80">
                             <span>🍹</span>
                             <span>{destination.mealPlan}</span>
                           </span>
                         )}
                         {destination.occupancy && (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200/80">
                             <span>👥</span>
                             <span>{destination.occupancy}</span>
                           </span>
                         )}
                         {destination.kidsPolicy && (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200/80">
                             <span>👶</span>
                             <span>{destination.kidsPolicy}</span>
                           </span>
                         )}
                       </div>
+
+                      {/* Top Highlights Preview */}
+                      {destination.highlights && destination.highlights.length > 0 && (
+                        <div className="space-y-1.5 pt-2 border-t border-slate-100">
+                          {destination.highlights.slice(0, 2).map((hl, idx) => (
+                            <div key={idx} className="flex items-center gap-2 text-[11px] text-slate-700 font-medium">
+                              <Check className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
+                              <span className="truncate">{hl}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
 
                     {/* Price Block and Actions */}
-                    <div className="pt-4 border-t border-slate-200/80 space-y-3">
-                      <div className="flex items-baseline justify-between">
+                    <div className="pt-4 border-t border-slate-100 space-y-3.5">
+                      <div className="flex items-baseline justify-between gap-2">
                         <div>
                           <span className="text-[9px] uppercase font-bold text-slate-400 block tracking-widest">
                             {destination.isResort
                               ? (language === 'es' ? 'PRECIO POR HABITACIÓN / NOCHE' : 'PRICE PER ROOM / NIGHT')
                               : (language === 'es' ? 'PRECIO POR PERSONA' : 'PRICE PER PERSON')}
                           </span>
-                          <span className="font-display text-2xl font-black text-slate-900">
+                          <span className="font-display text-2xl font-black text-slate-900 tracking-tight">
                             {destination.isResort && destination.pricePerNight ? destination.pricePerNight : price}
                           </span>
                         </div>
 
-                        <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
-                          {initialPay}
+                        <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200/90 shadow-sm flex items-center gap-1 flex-shrink-0">
+                          <Sparkles className="w-3 h-3 text-emerald-600" />
+                          <span>{initialPay}</span>
                         </span>
                       </div>
 
-                      {/* Buttons: Clean Dark pill Cotizar + subtle Itinerario */}
+                      {/* Buttons: Sleek Glass Itinerario + Emerald/Dark Cotizar */}
                       <div className="flex items-center gap-2 pt-1">
                         <button
                           onClick={() => onSelectDestination(destination)}
-                          className="flex-1 py-2.5 px-3 rounded-full text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-all flex items-center justify-center gap-1 cursor-pointer"
+                          className="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200/80 transition-all flex items-center justify-center gap-1.5 cursor-pointer group/btn"
                         >
+                          <Eye className="w-3.5 h-3.5 text-slate-600 group-hover/btn:scale-110 transition-transform" />
                           <span>{language === 'es' ? 'Itinerario' : 'Itinerary'}</span>
-                          <ArrowRight className="w-3.5 h-3.5" />
                         </button>
 
                         <a
                           href={whatsappUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-full text-xs font-black text-white bg-slate-950 hover:bg-slate-850 shadow-md transition-all"
+                          className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl text-xs font-black text-white bg-slate-950 hover:bg-slate-850 shadow-md hover:shadow-lg transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
                         >
-                          <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
+                          <MessageCircle className="w-3.5 h-3.5 text-emerald-400 fill-current" />
                           <span>{language === 'es' ? 'Cotizar' : 'Quote'}</span>
                         </a>
                       </div>
