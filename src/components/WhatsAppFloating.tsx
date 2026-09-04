@@ -1,15 +1,15 @@
 import { MessageCircle } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { getWhatsAppUrl } from '../config/whatsapp';
 
 export function WhatsAppFloating() {
   const { language } = useLanguage();
 
-  const whatsappMessage = encodeURIComponent(
+  const msg =
     language === 'es'
       ? '¡Hola equipo ACA Travel! Quisiera solicitar información sobre sus paquetes y asesoría de visa.'
-      : 'Hello ACA Travel! I would like to request information about your packages and visa services.'
-  );
-  const whatsappUrl = `https://wa.me/?text=${whatsappMessage}`;
+      : 'Hello ACA Travel! I would like to request information about your packages and visa services.';
+  const whatsappUrl = getWhatsAppUrl(msg);
 
   return (
     <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40">

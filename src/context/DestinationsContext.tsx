@@ -77,7 +77,24 @@ export function DestinationsProvider({ children }: { children: React.ReactNode }
       const saved = localStorage.getItem(STORAGE_KEY_DESTINATIONS);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.map((item: Destination) => {
+            const initialMatch = DESTINATIONS.find((d) => d.id === item.id);
+            if (initialMatch) {
+              return {
+                ...initialMatch,
+                ...item,
+                occupancy: item.occupancy || initialMatch.occupancy,
+                kidsPolicy: item.kidsPolicy || initialMatch.kidsPolicy,
+                mealPlan: item.mealPlan || initialMatch.mealPlan,
+                isResort: item.isResort !== undefined ? item.isResort : initialMatch.isResort,
+                pricePerNight: item.pricePerNight || initialMatch.pricePerNight,
+                roomType: item.roomType || initialMatch.roomType,
+              };
+            }
+            return item;
+          });
+        }
       }
     } catch (e) {
       console.error('Error loading destinations from localStorage:', e);

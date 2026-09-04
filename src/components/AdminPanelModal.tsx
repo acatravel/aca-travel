@@ -378,6 +378,9 @@ export function AdminPanelModal({ isOpen: propIsOpen, onClose: propOnClose }: Ad
       description: formData.description?.trim() || '',
       highlights: (formData.highlights || []).filter((h) => h.trim().length > 0),
       includes: (formData.includes || []).filter((i) => i.trim().length > 0),
+      occupancy: formData.occupancy?.trim() || (formData.isResort ? '2 Adultos' : 'Por persona en base doble'),
+      kidsPolicy: formData.kidsPolicy?.trim() || (formData.isResort ? '¡Hasta 2 Niños GRATIS!' : ''),
+      mealPlan: formData.mealPlan?.trim() || (formData.isResort ? 'Todo Incluido 24 Horas' : 'Desayunos incluidos'),
       itinerarySummary: (formData.itinerarySummary || []).filter((it) => it.activity.trim().length > 0),
     };
 
@@ -807,7 +810,7 @@ export function AdminPanelModal({ isOpen: propIsOpen, onClose: propOnClose }: Ad
                 
                 {/* SECCIÓN 1: TIPO DE PAQUETE (TOGGLE RESORT) */}
                 <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-800 border border-amber-400/30 shadow-md">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
                       <div className={`p-2.5 rounded-xl ${formData.isResort ? 'bg-cyan-500/20 text-cyan-300' : 'bg-amber-400/20 text-amber-300'}`}>
                         {formData.isResort ? <Building2 className="w-5 h-5" /> : <Plane className="w-5 h-5" />}
@@ -818,29 +821,34 @@ export function AdminPanelModal({ isOpen: propIsOpen, onClose: propOnClose }: Ad
                         </h4>
                         <p className="text-xs text-slate-400">
                           {formData.isResort
-                            ? 'Los resorts incluyen tarifa por habitación por noche y tipo de alojamiento.'
-                            : 'Los tours estándar se cotizan por persona con itinerario y vuelos.'}
+                            ? 'Los resorts incluyen estadía, plan Todo Incluido 24h, amenidades y beneficios familiares.'
+                            : 'Los tours estándar incluyen vuelos, traslados, itinerario por días y excursiones.'}
                         </p>
                       </div>
                     </div>
 
-                    <label className="relative inline-flex items-center cursor-pointer select-none">
-                      <input
-                        type="checkbox"
-                        checked={!!formData.isResort}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            isResort: e.target.checked,
-                            badge: e.target.checked ? '🏨 Resort Todo Incluido' : formData.badge,
-                          })
-                        }
-                        className="sr-only peer"
-                      />
-                      <div className="w-13 h-7 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[3px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-cyan-500"></div>
-                      <span className="ml-2.5 text-xs font-bold text-white">
-                        {formData.isResort ? 'Es Resort' : 'Marcar como Resort'}
+                    <label className="inline-flex items-center cursor-pointer select-none gap-3 bg-slate-800 hover:bg-slate-750 px-4 py-2.5 rounded-2xl border border-slate-700/80 transition-all">
+                      <span className="text-xs font-bold text-white whitespace-nowrap">
+                        {formData.isResort ? '🏨 Modo Resort' : '✈️ Modo Tour'}
                       </span>
+                      <div className="relative inline-flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={!!formData.isResort}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              isResort: e.target.checked,
+                              badge: e.target.checked ? '🏨 Resort Todo Incluido' : formData.badge,
+                              mealPlan: e.target.checked ? 'Todo Incluido 24 Horas' : (formData.mealPlan || 'Desayunos diarios'),
+                              occupancy: e.target.checked ? '2 Adultos' : (formData.occupancy || 'Base doble'),
+                              kidsPolicy: e.target.checked ? '¡2 Niños GRATIS hasta 11 años!' : formData.kidsPolicy,
+                            })
+                          }
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
+                      </div>
                     </label>
                   </div>
                 </div>
@@ -1088,6 +1096,45 @@ export function AdminPanelModal({ isOpen: propIsOpen, onClose: propOnClose }: Ad
                         placeholder="Ej: ✅ ¡Sin Visa Requerida!"
                         value={formData.visaRequirement || ''}
                         onChange={(e) => setFormData({ ...formData, visaRequirement: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white focus:outline-none focus:border-amber-400"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-300 mb-1">
+                        {formData.isResort ? 'Ocupación de la Habitación' : 'Pasajeros / Ocupación'}
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Ej: 2 Adultos o Base Doble"
+                        value={formData.occupancy || ''}
+                        onChange={(e) => setFormData({ ...formData, occupancy: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white focus:outline-none focus:border-amber-400"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-amber-300 mb-1">
+                        Promoción / Niños Gratis
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Ej: ¡2 Niños GRATIS hasta 11 años!"
+                        value={formData.kidsPolicy || ''}
+                        onChange={(e) => setFormData({ ...formData, kidsPolicy: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-amber-400/40 text-sm text-white focus:outline-none focus:border-amber-400"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-300 mb-1">
+                        Plan de Alimentación
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Ej: Todo Incluido 24h / Desayunos Buffet"
+                        value={formData.mealPlan || ''}
+                        onChange={(e) => setFormData({ ...formData, mealPlan: e.target.value })}
                         className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white focus:outline-none focus:border-amber-400"
                       />
                     </div>

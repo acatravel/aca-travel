@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import type { Destination } from '../types';
-import { X, Check, Plane, Clock, ShieldCheck, MessageCircle, Calendar, ChevronLeft, ChevronRight, Building2 } from 'lucide-react';
+import { X, Check, Plane, Clock, ShieldCheck, MessageCircle, Calendar, ChevronLeft, ChevronRight, Building2, Users, Utensils, Sparkles } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { getWhatsAppUrl } from '../config/whatsapp';
 
 interface DestinationModalProps {
   destination: Destination | null;
@@ -25,12 +26,11 @@ export function DestinationModal({ destination, onClose }: DestinationModalProps
     ? destination.pricePerNight
     : destination.priceEstimate;
 
-  const whatsappModalMessage = encodeURIComponent(
+  const whatsappModalMessage =
     language === 'es'
       ? `¡Hola equipo ACA Travel! Quiero apartar mi lugar para ${destination.isResort ? 'el resort' : 'el paquete'} "${destination.title}" (${destination.duration} - ${displayPrice}). ¿Cuáles son las próximas fechas de salida y los pasos para el abono inicial?`
-      : `Hello ACA Travel! I would like to book my place for "${destination.titleEn || destination.title}" (${destination.durationEn || destination.duration} - ${displayPrice}). What are the upcoming departure dates and booking steps?`
-  );
-  const whatsappUrl = `https://wa.me/?text=${whatsappModalMessage}`;
+      : `Hello ACA Travel! I would like to book my place for "${destination.titleEn || destination.title}" (${destination.durationEn || destination.duration} - ${displayPrice}). What are the upcoming departure dates and booking steps?`;
+  const whatsappUrl = getWhatsAppUrl(whatsappModalMessage);
 
   const title = language === 'en' && destination.titleEn ? destination.titleEn : destination.title;
   const duration = language === 'en' && destination.durationEn ? destination.durationEn : destination.duration;
@@ -166,6 +166,39 @@ export function DestinationModal({ destination, onClose }: DestinationModalProps
               </span>
             </div>
           </div>
+
+          {/* Package Inclusions & Specs Grid */}
+          {(destination.mealPlan || destination.occupancy || destination.kidsPolicy || destination.roomType) && (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs">
+              {destination.mealPlan && (
+                <div className="flex items-center gap-2 text-slate-800 font-medium">
+                  <Utensils className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                  <div>
+                    <span className="text-[10px] uppercase font-bold text-amber-900 block">Régimen</span>
+                    <span className="font-bold text-slate-900">{destination.mealPlan}</span>
+                  </div>
+                </div>
+              )}
+              {destination.occupancy && (
+                <div className="flex items-center gap-2 text-slate-800 font-medium">
+                  <Users className="w-4 h-4 text-brandBlue-600 flex-shrink-0" />
+                  <div>
+                    <span className="text-[10px] uppercase font-bold text-slate-500 block">Capacidad</span>
+                    <span className="font-bold text-slate-900">{destination.occupancy}</span>
+                  </div>
+                </div>
+              )}
+              {destination.kidsPolicy && (
+                <div className="flex items-center gap-2 text-slate-800 font-medium">
+                  <Sparkles className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                  <div>
+                    <span className="text-[10px] uppercase font-bold text-emerald-800 block">Promoción Familiar</span>
+                    <span className="font-black text-emerald-700">{destination.kidsPolicy}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Detailed Description */}
           <div>

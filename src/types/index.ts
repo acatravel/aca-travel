@@ -42,6 +42,13 @@ export interface Destination {
   highlightsEn?: string[];
   includes: string[];
   includesEn?: string[];
+  occupancy?: string;
+  occupancyEn?: string;
+  kidsPolicy?: string;
+  kidsPolicyEn?: string;
+  mealPlan?: string;
+  mealPlanEn?: string;
+  resortAmenities?: string[];
   itinerarySummary: { day: string; activity: string; activityEn?: string }[];
 }
 

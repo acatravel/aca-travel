@@ -1,16 +1,16 @@
 import { Music2, MessageCircle, ShieldCheck } from 'lucide-react';
 import { InstagramIcon } from './Icons';
 import { useLanguage } from '../context/LanguageContext';
+import { getWhatsAppUrl } from '../config/whatsapp';
 
 export function Footer() {
   const { language } = useLanguage();
 
-  const whatsappFooterMessage = encodeURIComponent(
+  const msg =
     language === 'es'
       ? '¡Hola equipo ACA Travel! Quisiera solicitar información sobre sus paquetes y viajes.'
-      : 'Hello ACA Travel team! I would like to inquire about your travel packages.'
-  );
-  const whatsappUrl = `https://wa.me/?text=${whatsappFooterMessage}`;
+      : 'Hello ACA Travel team! I would like to inquire about your travel packages.';
+  const whatsappUrl = getWhatsAppUrl(msg);
 
   return (
     <footer className="bg-slate-900 text-slate-400 border-t border-slate-800 pt-16 pb-12 text-xs">

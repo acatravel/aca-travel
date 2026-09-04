@@ -406,19 +406,27 @@ export function ReviewsAndFeedback() {
 
                       {/* Vacation Photo Attachment Preview (if uploaded) */}
                       {current.vacationPhoto && (
-                        <div className="pt-2 flex items-center gap-2">
-                          <button
-                            type="button"
+                        <div className="pt-2">
+                          <div
                             onClick={() => setSelectedVacationPhotoPreview(current.vacationPhoto || null)}
-                            className="group/photo relative inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 border border-slate-200 text-[11px] font-bold text-slate-700 cursor-pointer transition-all shadow-xs"
+                            className="group/vphoto relative rounded-2xl overflow-hidden border border-slate-200/90 shadow-sm hover:shadow-md transition-all cursor-pointer bg-slate-950"
+                            title="Clic para ampliar foto de vacaciones"
                           >
                             <img
                               src={current.vacationPhoto}
-                              alt="Vacaciones"
-                              className="w-5 h-5 rounded-md object-cover border border-white"
+                              alt={`Vacaciones de ${current.name} en ${current.destination}`}
+                              className="w-full h-32 sm:h-36 object-cover group-hover:scale-105 transition-transform duration-500"
                             />
-                            <span>Ver foto de sus vacaciones 📷</span>
-                          </button>
+                            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end justify-between p-2.5">
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-950/80 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold">
+                                <Camera className="w-3 h-3 text-amber-300" />
+                                <span>Foto de sus vacaciones en {current.destination}</span>
+                              </span>
+                              <span className="text-[10px] font-bold text-amber-300 bg-slate-950/80 px-2 py-0.5 rounded-md border border-amber-300/30 backdrop-blur-xs">
+                                🔍 Ver grande
+                              </span>
+                            </div>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -450,10 +458,10 @@ export function ReviewsAndFeedback() {
                       ) : (
                         <div className={slideDirection === 'next' ? 'animate-slide-right' : 'animate-slide-left'}>
                           <h4 className="font-display text-sm font-black text-slate-900 truncate">
-                            {current.name}
+                            {current.name} {current.lastname ? (current.lastname.endsWith('.') ? current.lastname : `${current.lastname}.`) : ''}
                           </h4>
                           <p className="text-[11px] text-terracotta-600 font-semibold truncate">
-                            {current.destination} ({current.city})
+                            {current.destination} • {current.city}
                           </p>
                         </div>
                       )}

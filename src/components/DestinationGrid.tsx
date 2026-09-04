@@ -5,6 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useDestinations } from '../context/DestinationsContext';
 import { useAdmin } from '../context/AdminContext';
 import { DestinationSkeleton } from './DestinationSkeleton';
+import { getWhatsAppUrl } from '../config/whatsapp';
 
 interface DestinationGridProps {
   selectedCategory: string;
@@ -246,12 +247,11 @@ export function DestinationGrid({
               const price = language === 'en' && destination.priceEstimateEn ? destination.priceEstimateEn : destination.priceEstimate;
               const initialPay = language === 'en' && destination.initialPaymentEn ? destination.initialPaymentEn : destination.initialPayment;
 
-              const whatsappMessage = encodeURIComponent(
+              const whatsappMessage =
                 language === 'es'
                   ? `¡Hola equipo ACA Travel! Me interesa el paquete de "${title}" (${duration} - ${price}). ¿Cuáles son las fechas disponibles y los pasos para el abono inicial?`
-                  : `Hello ACA Travel! I am interested in "${title}" (${duration} - ${price}). What are the available dates and initial payment steps?`
-              );
-              const whatsappUrl = `https://wa.me/?text=${whatsappMessage}`;
+                  : `Hello ACA Travel! I am interested in "${title}" (${duration} - ${price}). What are the available dates and initial payment steps?`;
+              const whatsappUrl = getWhatsAppUrl(whatsappMessage);
 
               return (
                 <div
@@ -328,13 +328,35 @@ export function DestinationGrid({
 
                   {/* Card Content with Clean Typography & High Contrast */}
                   <div className="p-6 sm:p-7 flex-1 flex flex-col justify-between space-y-4">
-                    <div>
+                    <div className="space-y-2">
                       <h3 className="font-display text-xl font-black text-slate-900 tracking-tight leading-snug group-hover:text-terracotta-600 transition-colors">
                         {title}
                       </h3>
-                      <p className="text-xs text-slate-600 font-normal leading-relaxed mt-2 line-clamp-2">
+                      <p className="text-xs text-slate-600 font-normal leading-relaxed line-clamp-2">
                         {language === 'en' && destination.descriptionEn ? destination.descriptionEn : destination.description}
                       </p>
+
+                      {/* Chips de lo que CONTIENE el paquete turístico o resort */}
+                      <div className="flex flex-wrap gap-1.5 pt-1">
+                        {destination.mealPlan && (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-amber-50 text-amber-900 border border-amber-200">
+                            <span>🍹</span>
+                            <span>{destination.mealPlan}</span>
+                          </span>
+                        )}
+                        {destination.occupancy && (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                            <span>👥</span>
+                            <span>{destination.occupancy}</span>
+                          </span>
+                        )}
+                        {destination.kidsPolicy && (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                            <span>👶</span>
+                            <span>{destination.kidsPolicy}</span>
+                          </span>
+                        )}
+                      </div>
                     </div>
 
                     {/* Price Block and Actions */}

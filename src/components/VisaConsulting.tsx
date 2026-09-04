@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { FileText, CheckCircle, ArrowRight, X, Send, ShieldCheck } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { getWhatsAppUrl } from '../config/whatsapp';
 
 export function VisaConsulting() {
   const { language } = useLanguage();
@@ -16,20 +17,19 @@ export function VisaConsulting() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitted(true);
-    const msg = encodeURIComponent(
+    const rawMsg =
       `¡Hola ACA Travel! Solicito Asesoría para Visa Europea / Schengen:\n\n` +
       `👤 *Nombre:* ${formData.fullName}\n` +
       `🌍 *Nacionalidad/Residencia:* ${formData.nationality}\n` +
       `📍 *Destinos europeos:* ${formData.destinations}\n` +
-      `📱 *Teléfono:* ${formData.phone}\n\n` +
-      `Deseo agendar la evaluación de mi perfil consular. ¡Gracias!`
-    );
+      `📱 *Teléfono de contacto:* ${formData.phone}\n\n` +
+      `Deseo agendar la evaluación de mi perfil consular. ¡Gracias!`;
 
     setTimeout(() => {
-      window.open(`https://wa.me/?text=${msg}`, '_blank');
+      window.open(getWhatsAppUrl(rawMsg), '_blank');
       setIsModalOpen(false);
       setSubmitted(false);
-    }, 1000);
+    }, 800);
   };
 
   return (

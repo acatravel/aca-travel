@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { X, Send, Compass, Users, Calendar, Coins, Plane, Zap } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { getWhatsAppUrl } from '../config/whatsapp';
 
 interface TripPlannerProps {
   isOpen: boolean;
@@ -20,7 +21,7 @@ export function TripPlanner({ isOpen, onClose }: TripPlannerProps) {
 
   const handleSendToWhatsApp = (e: React.FormEvent) => {
     e.preventDefault();
-    const message = encodeURIComponent(
+    const rawMessage =
       `¡Hola equipo ACA Travel! Acabo de armar mi cotización de viaje en su web:\n\n` +
       `📍 *Destino deseado:* ${destination}\n` +
       `✈️ *Salida / Ciudad origen:* ${departure}\n` +
@@ -28,9 +29,9 @@ export function TripPlanner({ isOpen, onClose }: TripPlannerProps) {
       `📅 *Fecha aproximada:* ${timeline}\n` +
       `💳 *Preferencia de pago:* ${paymentPlan}\n` +
       (notes ? `📝 *Detalles/Deseos:* ${notes}\n\n` : '\n') +
-      `¿Me pueden enviar disponibilidad de vuelos y cotización detallada? ¡Muchas gracias!`
-    );
-    window.open(`https://wa.me/?text=${message}`, '_blank');
+      `¿Me pueden enviar disponibilidad de vuelos y cotización detallada? ¡Muchas gracias!`;
+
+    window.open(getWhatsAppUrl(rawMessage), '_blank');
     onClose();
   };
 

@@ -22,7 +22,20 @@ export function TestimonialsProvider({ children }: { children: React.ReactNode }
       const saved = localStorage.getItem(STORAGE_KEY_TESTIMONIALS);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.map((item: Testimonial) => {
+            const initialMatch = INITIAL_TESTIMONIALS.find((it) => it.id === item.id);
+            if (initialMatch) {
+              return {
+                ...initialMatch,
+                ...item,
+                vacationPhoto: item.vacationPhoto || initialMatch.vacationPhoto,
+                lastname: item.lastname || initialMatch.lastname,
+              };
+            }
+            return item;
+          });
+        }
       }
     } catch (e) {
       console.error('Error loading testimonials from localStorage:', e);
