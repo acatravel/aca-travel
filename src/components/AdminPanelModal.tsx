@@ -20,7 +20,8 @@ import {
   Plane,
   Star,
   MessageSquare,
-  Loader2
+  Loader2,
+  Calendar
 } from 'lucide-react';
 import { useDestinations } from '../context/DestinationsContext';
 import { useAdmin } from '../context/AdminContext';
@@ -398,6 +399,79 @@ export function AdminPanelModal({ isOpen: propIsOpen, onClose: propOnClose }: Ad
         image: newPrimary,
       };
     });
+  };
+
+  // Highlights (Puntos clave) Handlers
+  const handleAddHighlight = () => {
+    setFormData((prev) => ({
+      ...prev,
+      highlights: [...(prev.highlights || []), ''],
+    }));
+  };
+
+  const handleUpdateHighlight = (index: number, val: string) => {
+    setFormData((prev) => {
+      const list = [...(prev.highlights || [])];
+      list[index] = val;
+      return { ...prev, highlights: list };
+    });
+  };
+
+  const handleRemoveHighlight = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      highlights: (prev.highlights || []).filter((_, idx) => idx !== index),
+    }));
+  };
+
+  // Includes (Qué incluye) Handlers
+  const handleAddInclude = () => {
+    setFormData((prev) => ({
+      ...prev,
+      includes: [...(prev.includes || []), ''],
+    }));
+  };
+
+  const handleUpdateInclude = (index: number, val: string) => {
+    setFormData((prev) => {
+      const list = [...(prev.includes || [])];
+      list[index] = val;
+      return { ...prev, includes: list };
+    });
+  };
+
+  const handleRemoveInclude = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      includes: (prev.includes || []).filter((_, idx) => idx !== index),
+    }));
+  };
+
+  // Itinerary (Itinerario día por día) Handlers
+  const handleAddItineraryDay = () => {
+    setFormData((prev) => {
+      const list = prev.itinerarySummary || [];
+      const nextNum = list.length + 1;
+      return {
+        ...prev,
+        itinerarySummary: [...list, { day: `Día ${nextNum}`, activity: '' }],
+      };
+    });
+  };
+
+  const handleUpdateItineraryDay = (index: number, field: 'day' | 'activity', val: string) => {
+    setFormData((prev) => {
+      const list = [...(prev.itinerarySummary || [])];
+      list[index] = { ...list[index], [field]: val };
+      return { ...prev, itinerarySummary: list };
+    });
+  };
+
+  const handleRemoveItineraryDay = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      itinerarySummary: (prev.itinerarySummary || []).filter((_, idx) => idx !== index),
+    }));
   };
 
   // Submit Form
@@ -1430,7 +1504,7 @@ export function AdminPanelModal({ isOpen: propIsOpen, onClose: propOnClose }: Ad
                   )}
                 </div>
 
-                {/* SECCIÓN 5: DESCRIPCIÓN Y DETALLES */}
+                {/* SECCIÓN 4: DESCRIPCIÓN Y DETALLES */}
                 <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
                   <h4 className="text-xs font-black uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
                     <Clock className="w-4 h-4" /> 4. Descripción del Viaje o Resort
@@ -1442,6 +1516,160 @@ export function AdminPanelModal({ isOpen: propIsOpen, onClose: propOnClose }: Ad
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white focus:outline-none focus:border-amber-400 resize-none"
                   />
+                </div>
+
+                {/* SECCIÓN 5: PUNTOS CLAVE DEL VIAJE (HIGHLIGHTS) */}
+                <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="text-xs font-black uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+                        <ShieldCheck className="w-4 h-4" /> 5. Puntos Clave del Viaje
+                      </h4>
+                      <p className="text-[11px] text-slate-400">
+                        Beneficios destacados con viñeta verde en la ficha del viaje.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleAddHighlight}
+                      className="px-3 py-1.5 rounded-xl bg-amber-400/10 hover:bg-amber-400/20 text-amber-300 text-xs font-bold border border-amber-400/30 flex items-center gap-1 cursor-pointer transition-colors"
+                    >
+                      <Plus className="w-3.5 h-3.5" /> Agregar Punto Clave
+                    </button>
+                  </div>
+
+                  <div className="space-y-2 pt-1">
+                    {(formData.highlights || []).length === 0 ? (
+                      <p className="text-xs text-slate-500 italic py-1">No hay puntos clave añadidos.</p>
+                    ) : (
+                      (formData.highlights || []).map((highlight, idx) => (
+                        <div key={idx} className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-amber-400 w-5 text-center flex-shrink-0">
+                            {idx + 1}.
+                          </span>
+                          <input
+                            type="text"
+                            value={highlight}
+                            onChange={(e) => handleUpdateHighlight(idx, e.target.value)}
+                            placeholder="Ej: Alojamiento en hoteles de primera categoría"
+                            className="flex-1 px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white focus:outline-none focus:border-amber-400"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveHighlight(idx)}
+                            className="p-2 rounded-xl bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition-colors cursor-pointer"
+                            title="Eliminar punto clave"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                {/* SECCIÓN 6: QUÉ INCLUYE EL PAQUETE */}
+                <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="text-xs font-black uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                        <Check className="w-4 h-4" /> 6. El Paquete Completo Incluye
+                      </h4>
+                      <p className="text-[11px] text-slate-400">
+                        Lista detallada de servicios, boletos, traslados o comidas que incluye el paquete.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleAddInclude}
+                      className="px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-500/30 flex items-center gap-1 cursor-pointer transition-colors"
+                    >
+                      <Plus className="w-3.5 h-3.5" /> Agregar Inclusión
+                    </button>
+                  </div>
+
+                  <div className="space-y-2 pt-1">
+                    {(formData.includes || []).length === 0 ? (
+                      <p className="text-xs text-slate-500 italic py-1">No hay inclusiones añadidas.</p>
+                    ) : (
+                      (formData.includes || []).map((item, idx) => (
+                        <div key={idx} className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-emerald-400 w-5 text-center flex-shrink-0">
+                            ✓
+                          </span>
+                          <input
+                            type="text"
+                            value={item}
+                            onChange={(e) => handleUpdateInclude(idx, e.target.value)}
+                            placeholder="Ej: Traslados privados aeropuerto - hotel"
+                            className="flex-1 px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white focus:outline-none focus:border-emerald-400"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveInclude(idx)}
+                            className="p-2 rounded-xl bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition-colors cursor-pointer"
+                            title="Eliminar inclusión"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                {/* SECCIÓN 7: ITINERARIO DÍA POR DÍA */}
+                <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="text-xs font-black uppercase tracking-wider text-cyan-400 flex items-center gap-1.5">
+                        <Calendar className="w-4 h-4" /> 7. Itinerario Día por Día
+                      </h4>
+                      <p className="text-[11px] text-slate-400">
+                        Cronograma diario del paquete (Día 1: Llegada, Día 2: Excursión, etc.).
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleAddItineraryDay}
+                      className="px-3 py-1.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 text-xs font-bold border border-cyan-500/30 flex items-center gap-1 cursor-pointer transition-colors"
+                    >
+                      <Plus className="w-3.5 h-3.5" /> Agregar Día
+                    </button>
+                  </div>
+
+                  <div className="space-y-2.5 pt-1">
+                    {(formData.itinerarySummary || []).length === 0 ? (
+                      <p className="text-xs text-slate-500 italic py-1">No hay días en el itinerario.</p>
+                    ) : (
+                      (formData.itinerarySummary || []).map((item, idx) => (
+                        <div key={idx} className="flex flex-col sm:flex-row sm:items-center gap-2 p-2.5 rounded-xl bg-slate-800/60 border border-slate-700">
+                          <input
+                            type="text"
+                            value={item.day}
+                            onChange={(e) => handleUpdateItineraryDay(idx, 'day', e.target.value)}
+                            placeholder="Día 1"
+                            className="w-full sm:w-28 px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-xs font-black text-amber-400 focus:outline-none focus:border-amber-400"
+                          />
+                          <input
+                            type="text"
+                            value={item.activity}
+                            onChange={(e) => handleUpdateItineraryDay(idx, 'activity', e.target.value)}
+                            placeholder="Actividad o descripción del día"
+                            className="flex-1 px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-xs text-white focus:outline-none focus:border-amber-400"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveItineraryDay(idx)}
+                            className="self-end sm:self-center p-2 rounded-lg bg-slate-900 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition-colors cursor-pointer"
+                            title="Eliminar día del itinerario"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))
+                    )}
+                  </div>
                 </div>
 
                 {/* Actions Footer */}

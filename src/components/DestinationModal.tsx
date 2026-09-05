@@ -42,59 +42,57 @@ export function DestinationModal({ destination, onClose }: DestinationModalProps
   const includes = language === 'en' && destination.includesEn ? destination.includesEn : destination.includes;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 animate-fadeInScale">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-6 animate-fadeInScale">
       <div 
-        className="relative w-full max-w-3xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden my-8"
+        className="relative w-full max-w-2xl max-h-[92vh] flex flex-col bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-200 overflow-hidden my-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-20 p-2.5 rounded-full bg-slate-900/70 hover:bg-slate-900 text-white backdrop-blur-md transition-colors cursor-pointer shadow-md"
+          className="absolute top-3 right-3 z-20 p-2 rounded-full bg-slate-900/70 hover:bg-slate-900 text-white backdrop-blur-md transition-colors cursor-pointer shadow-md"
           aria-label="Cerrar modal"
         >
-          <X className="w-5 h-5" />
+          <X className="w-4 h-4" />
         </button>
 
-        {/* Header Hero Image with Gallery Controls */}
-        <div className="relative h-72 sm:h-84 w-full overflow-hidden bg-slate-900">
+        {/* Header Hero Image with Gallery Controls - Clean and Unobstructed */}
+        <div className="relative h-52 sm:h-64 w-full overflow-hidden bg-slate-900 shrink-0 select-none">
           <img
             key={currentPhoto}
             src={currentPhoto}
             alt={title}
             className="w-full h-full object-cover transition-opacity duration-300"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
+          {/* Subtle top vignette for button contrast */}
+          <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-slate-950/70 to-transparent pointer-events-none" />
 
-          {/* Badges */}
-          <div className="absolute top-5 left-5 flex flex-wrap gap-2 z-10">
+          {/* Badges on Top-Left */}
+          <div className="absolute top-3 left-3 flex flex-wrap items-center gap-1.5 z-10 pointer-events-none">
             {destination.badge && (
-              <span className="px-3 py-1 rounded-lg bg-brandOrange-500 text-white text-xs font-black uppercase tracking-wider shadow-md">
+              <span className="px-2.5 py-1 rounded-lg bg-brandOrange-500/95 backdrop-blur-md text-white text-[10px] sm:text-[11px] font-black uppercase tracking-wider shadow-md">
                 {language === 'en' && destination.badgeEn ? destination.badgeEn : destination.badge}
               </span>
             )}
             {destination.isResort && (
-              <span className="px-3 py-1 rounded-lg bg-cyan-500 text-slate-950 text-xs font-black uppercase tracking-wider shadow-md flex items-center gap-1">
-                <Building2 className="w-3.5 h-3.5" /> Resort
+              <span className="px-2.5 py-1 rounded-lg bg-cyan-500/95 backdrop-blur-md text-slate-950 text-[10px] sm:text-[11px] font-black uppercase tracking-wider shadow-md flex items-center gap-1">
+                <Building2 className="w-3 h-3" /> Resort
               </span>
             )}
-            <span className="px-3 py-1 rounded-lg bg-slate-900/80 backdrop-blur-md text-white text-xs font-bold flex items-center gap-1">
-              <Clock className="w-3.5 h-3.5 text-brandOrange-400" />
-              <span>{duration}</span>
-            </span>
           </div>
 
           {/* Gallery navigation buttons if multiple images */}
           {imagesList.length > 1 && (
-            <div className="absolute top-1/2 -translate-y-1/2 left-4 right-4 flex items-center justify-between pointer-events-none z-10">
+            <div className="absolute inset-y-0 left-2 right-2 flex items-center justify-between pointer-events-none z-10">
               <button
                 type="button"
                 onClick={() =>
                   setSelectedPhotoIndex((prev) => (prev - 1 + imagesList.length) % imagesList.length)
                 }
                 className="pointer-events-auto p-2 rounded-full bg-slate-900/70 hover:bg-slate-900 text-white backdrop-blur-md transition-all cursor-pointer shadow-md"
+                aria-label="Foto anterior"
               >
-                <ChevronLeft className="w-5 h-5" />
+                <ChevronLeft className="w-4 h-4" />
               </button>
               <button
                 type="button"
@@ -102,66 +100,82 @@ export function DestinationModal({ destination, onClose }: DestinationModalProps
                   setSelectedPhotoIndex((prev) => (prev + 1) % imagesList.length)
                 }
                 className="pointer-events-auto p-2 rounded-full bg-slate-900/70 hover:bg-slate-900 text-white backdrop-blur-md transition-all cursor-pointer shadow-md"
+                aria-label="Siguiente foto"
               >
-                <ChevronRight className="w-5 h-5" />
+                <ChevronRight className="w-4 h-4" />
               </button>
             </div>
           )}
 
-          {/* Hero text */}
-          <div className="absolute bottom-5 left-5 right-5 z-10">
-            <div className="flex items-center gap-2 mb-2 flex-wrap">
-              <span className="inline-block text-xs font-bold px-2.5 py-0.5 rounded bg-emerald-500 text-white shadow-xs">
+          {/* Photo Counter Pill (Bottom Right) */}
+          {imagesList.length > 1 && (
+            <div className="absolute bottom-3 right-3 z-10 px-2.5 py-1 rounded-full bg-slate-950/80 backdrop-blur-md text-white text-[10px] font-bold shadow-md">
+              {selectedPhotoIndex + 1} / {imagesList.length} fotos
+            </div>
+          )}
+        </div>
+
+        {/* Dedicated Thumbnail Strip (below photo, if multiple images) */}
+        {imagesList.length > 1 && (
+          <div className="bg-slate-950 px-3 py-2 flex items-center gap-2 overflow-x-auto no-scrollbar shrink-0 border-b border-slate-800">
+            {imagesList.map((img, idx) => (
+              <button
+                type="button"
+                key={idx}
+                onClick={() => setSelectedPhotoIndex(idx)}
+                className={`relative w-12 h-8 rounded-lg overflow-hidden border-2 transition-all cursor-pointer flex-shrink-0 ${
+                  selectedPhotoIndex === idx
+                    ? 'border-amber-400 scale-105 shadow-md ring-1 ring-amber-400'
+                    : 'border-slate-700 opacity-60 hover:opacity-100'
+                }`}
+              >
+                <img src={img} alt="" className="w-full h-full object-cover" />
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Modal Body (Scrollable with clean layout) */}
+        <div className="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1">
+          
+          {/* Destination Title & Primary Tags */}
+          <div className="space-y-1.5">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[11px] font-bold flex items-center gap-1 border border-slate-200">
+                <Clock className="w-3 h-3 text-brandOrange-500" />
+                <span>{duration}</span>
+              </span>
+              <span className="px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-[11px] font-bold border border-emerald-200">
                 {visaReq}
               </span>
               {destination.roomType && (
-                <span className="inline-block text-xs font-bold px-2.5 py-0.5 rounded bg-cyan-400 text-slate-950 shadow-xs">
+                <span className="px-2.5 py-0.5 rounded-md bg-cyan-50 text-cyan-800 text-[11px] font-bold border border-cyan-200">
                   {destination.roomType}
                 </span>
               )}
             </div>
 
-            <h2 className="font-display text-2xl sm:text-4xl font-black text-white leading-tight">
+            <h2 className="font-display text-xl sm:text-2xl font-black text-slate-900 leading-tight">
               {title}
             </h2>
-            <p className="text-xs sm:text-sm text-slate-200 mt-1 line-clamp-1">
-              {tagline}
-            </p>
-
-            {/* Thumbnail switcher */}
-            {imagesList.length > 1 && (
-              <div className="flex items-center gap-2 pt-3 overflow-x-auto no-scrollbar">
-                {imagesList.map((img, idx) => (
-                  <button
-                    type="button"
-                    key={idx}
-                    onClick={() => setSelectedPhotoIndex(idx)}
-                    className={`w-12 h-8 rounded-lg overflow-hidden border-2 transition-all cursor-pointer flex-shrink-0 ${
-                      selectedPhotoIndex === idx ? 'border-amber-400 scale-105 shadow-md' : 'border-white/50 opacity-60 hover:opacity-100'
-                    }`}
-                  >
-                    <img src={img} alt="" className="w-full h-full object-cover" />
-                  </button>
-                ))}
-              </div>
+            {tagline && (
+              <p className="text-xs text-slate-500 leading-normal">
+                {tagline}
+              </p>
             )}
           </div>
-        </div>
-
-        {/* Modal Body */}
-        <div className="p-6 sm:p-8 space-y-6 max-h-[55vh] overflow-y-auto">
           
           {/* Departure & Price Strip */}
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-800">
-              <Plane className="w-4 h-4 text-brandBlue-600" />
+          <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex flex-wrap items-center justify-between gap-2.5">
+            <div className="flex items-center gap-2 text-xs font-bold text-slate-800">
+              <Plane className="w-3.5 h-3.5 text-brandBlue-600" />
               <span>{departure}</span>
             </div>
-            <div className="flex items-center gap-3">
-              <span className="text-xs text-slate-500 font-bold">
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] text-slate-500 font-bold">
                 {language === 'es' ? 'Aparta desde:' : 'Reserve from:'}
               </span>
-              <span className="font-display text-lg font-black text-emerald-600">
+              <span className="font-display text-base font-black text-emerald-600">
                 {language === 'en' && destination.initialPaymentEn ? destination.initialPaymentEn : destination.initialPayment}
               </span>
             </div>
@@ -169,31 +183,31 @@ export function DestinationModal({ destination, onClose }: DestinationModalProps
 
           {/* Package Inclusions & Specs Grid */}
           {(destination.mealPlan || destination.occupancy || destination.kidsPolicy || destination.roomType) && (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs">
               {destination.mealPlan && (
                 <div className="flex items-center gap-2 text-slate-800 font-medium">
-                  <Utensils className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                  <Utensils className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
                   <div>
-                    <span className="text-[10px] uppercase font-bold text-amber-900 block">Régimen</span>
-                    <span className="font-bold text-slate-900">{destination.mealPlan}</span>
+                    <span className="text-[9px] uppercase font-bold text-amber-900 block">Régimen</span>
+                    <span className="font-bold text-slate-900 text-xs">{destination.mealPlan}</span>
                   </div>
                 </div>
               )}
               {destination.occupancy && (
                 <div className="flex items-center gap-2 text-slate-800 font-medium">
-                  <Users className="w-4 h-4 text-brandBlue-600 flex-shrink-0" />
+                  <Users className="w-3.5 h-3.5 text-brandBlue-600 flex-shrink-0" />
                   <div>
-                    <span className="text-[10px] uppercase font-bold text-slate-500 block">Capacidad</span>
-                    <span className="font-bold text-slate-900">{destination.occupancy}</span>
+                    <span className="text-[9px] uppercase font-bold text-slate-500 block">Capacidad</span>
+                    <span className="font-bold text-slate-900 text-xs">{destination.occupancy}</span>
                   </div>
                 </div>
               )}
               {destination.kidsPolicy && (
                 <div className="flex items-center gap-2 text-slate-800 font-medium">
-                  <Sparkles className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
                   <div>
-                    <span className="text-[10px] uppercase font-bold text-emerald-800 block">Promoción Familiar</span>
-                    <span className="font-black text-emerald-700">{destination.kidsPolicy}</span>
+                    <span className="text-[9px] uppercase font-bold text-emerald-800 block">Promoción Familiar</span>
+                    <span className="font-black text-emerald-700 text-xs">{destination.kidsPolicy}</span>
                   </div>
                 </div>
               )}
@@ -202,23 +216,23 @@ export function DestinationModal({ destination, onClose }: DestinationModalProps
 
           {/* Detailed Description */}
           <div>
-            <h3 className="font-display text-base font-black text-slate-900 mb-2">
+            <h3 className="font-display text-sm sm:text-base font-black text-slate-900 mb-1.5">
               {language === 'es' ? 'Descripción de la Experiencia' : 'Experience Overview'}
             </h3>
-            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
+            <p className="text-xs text-slate-600 leading-relaxed font-normal">
               {description}
             </p>
           </div>
 
           {/* Highlights & Inclusions Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
             {/* Highlights */}
-            <div className="space-y-3">
-              <h4 className="font-display text-sm font-black text-slate-900 flex items-center gap-1.5">
+            <div className="space-y-2">
+              <h4 className="font-display text-xs sm:text-sm font-black text-slate-900 flex items-center gap-1.5">
                 <ShieldCheck className="w-4 h-4 text-brandOrange-500" />
                 <span>{language === 'es' ? 'Puntos Clave del Viaje' : 'Key Trip Highlights'}</span>
               </h4>
-              <ul className="space-y-2">
+              <ul className="space-y-1.5">
                 {highlights.map((item, idx) => (
                   <li key={idx} className="flex items-start gap-2 text-xs text-slate-700">
                     <Check className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0 mt-0.5" />
@@ -229,12 +243,12 @@ export function DestinationModal({ destination, onClose }: DestinationModalProps
             </div>
 
             {/* Inclusions */}
-            <div className="space-y-3">
-              <h4 className="font-display text-sm font-black text-slate-900 flex items-center gap-1.5">
+            <div className="space-y-2">
+              <h4 className="font-display text-xs sm:text-sm font-black text-slate-900 flex items-center gap-1.5">
                 <Check className="w-4 h-4 text-emerald-500" />
                 <span>{language === 'es' ? 'El Paquete Completo Incluye' : 'The Complete Package Includes'}</span>
               </h4>
-              <ul className="space-y-2">
+              <ul className="space-y-1.5">
                 {includes.map((item, idx) => (
                   <li key={idx} className="flex items-start gap-2 text-xs text-slate-700">
                     <Check className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0 mt-0.5" />
@@ -247,15 +261,15 @@ export function DestinationModal({ destination, onClose }: DestinationModalProps
 
           {/* Day by Day Itinerary */}
           {destination.itinerarySummary && destination.itinerarySummary.length > 0 && (
-            <div className="pt-4 border-t border-slate-100">
-              <h4 className="font-display text-sm font-black text-slate-900 flex items-center gap-1.5 mb-3">
+            <div className="pt-3 border-t border-slate-100">
+              <h4 className="font-display text-xs sm:text-sm font-black text-slate-900 flex items-center gap-1.5 mb-2.5">
                 <Calendar className="w-4 h-4 text-brandBlue-600" />
                 <span>{language === 'es' ? 'Itinerario Resumido Día por Día' : 'Day-by-Day Itinerary Outline'}</span>
               </h4>
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 {destination.itinerarySummary.map((item, i) => (
-                  <div key={i} className="p-3 rounded-xl bg-slate-50 border border-slate-100 flex items-start gap-3">
-                    <span className="text-xs font-black text-brandOrange-600 flex-shrink-0 px-2 py-0.5 bg-brandOrange-50 rounded-md">
+                  <div key={i} className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex items-start gap-2.5">
+                    <span className="text-[11px] font-black text-brandOrange-600 flex-shrink-0 px-2 py-0.5 bg-brandOrange-50 rounded-md">
                       {item.day}
                     </span>
                     <span className="text-xs text-slate-700 font-medium">
@@ -270,22 +284,22 @@ export function DestinationModal({ destination, onClose }: DestinationModalProps
         </div>
 
         {/* Modal Action Footer */}
-        <div className="p-6 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div>
-            <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+        <div className="p-3.5 sm:p-5 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
+          <div className="text-center sm:text-left">
+            <p className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-wider">
               {destination.isResort
                 ? (language === 'es' ? 'Tarifa por Habitación / Noche' : 'Rate per Room / Night')
                 : (language === 'es' ? 'Tarifa Total por Pasajero' : 'Total Rate per Traveler')}
             </p>
-            <p className="font-display text-3xl font-black text-slate-900">
+            <p className="font-display text-2xl sm:text-3xl font-black text-slate-900">
               {displayPrice}
             </p>
           </div>
 
-          <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="flex items-center gap-2.5 w-full sm:w-auto">
             <button
               onClick={onClose}
-              className="flex-1 sm:flex-none py-3.5 px-5 rounded-xl text-xs font-bold text-slate-700 bg-white hover:bg-slate-100 border border-slate-300 transition-colors cursor-pointer"
+              className="flex-1 sm:flex-none py-2.5 px-4 sm:py-3 sm:px-5 rounded-xl text-xs font-bold text-slate-700 bg-white hover:bg-slate-100 border border-slate-300 transition-colors cursor-pointer"
             >
               {language === 'es' ? 'Cerrar' : 'Close'}
             </button>
@@ -294,7 +308,7 @@ export function DestinationModal({ destination, onClose }: DestinationModalProps
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl text-xs font-extrabold text-white bg-gradient-to-r from-brandOrange-500 to-amber-500 hover:from-brandOrange-600 hover:to-amber-600 shadow-glow-orange hover:shadow-xl transition-all"
+              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 py-2.5 px-5 sm:py-3 sm:px-6 rounded-xl text-xs font-extrabold text-white bg-gradient-to-r from-brandOrange-500 to-amber-500 hover:from-brandOrange-600 hover:to-amber-600 shadow-glow-orange hover:shadow-xl transition-all"
             >
               <MessageCircle className="w-4 h-4" />
               <span>{language === 'es' ? 'Cotizar en WhatsApp' : 'Get WhatsApp Quote'}</span>

@@ -38,10 +38,9 @@ export function ReviewsAndFeedback() {
   const { testimonials, addTestimonial, deleteTestimonial } = useTestimonials();
   const { isAdmin, setIsCommentsModalOpen, setTargetEditingTestimonial } = useAdmin();
 
-  // Filtrar testimonios visibles: solo aprobados si no es admin
+  // Filtrar testimonios visibles: únicamente los aprobados por el administrador
   const visibleTestimonials = testimonials.filter((t) => {
-    if (isAdmin) return true;
-    return !t.status || t.status === 'approved';
+    return t.status === 'approved';
   });
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -239,7 +238,7 @@ export function ReviewsAndFeedback() {
         vacationPhoto: formData.vacationPhoto || undefined,
         rating: formData.rating,
         highlightTag: formData.highlightTag || 'Viajero Verificado',
-        status: 'approved', // Aprobado para visibilidad inmediata
+        status: 'pending', // Requiere aprobación del administrador para publicarse
         createdAt: Date.now(),
       };
 
@@ -527,8 +526,8 @@ export function ReviewsAndFeedback() {
                     <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
                     <span>
                       {language === 'es'
-                        ? '¡Gracias! Tu reseña ha sido publicada con éxito.'
-                        : 'Thank you! Your review has been successfully posted.'}
+                        ? '¡Gracias! Tu reseña fue enviada con éxito y se publicará tras la aprobación del administrador.'
+                        : 'Thank you! Your review was submitted and will be published after administrator approval.'}
                     </span>
                   </div>
                 )}

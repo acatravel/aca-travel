@@ -1,13 +1,13 @@
 import { useState, useTransition, useMemo } from 'react';
 import type { Destination } from '../types';
-import { 
-  MessageCircle, 
-  Clock, 
-  Sparkles, 
-  ChevronLeft, 
-  ChevronRight, 
-  Edit3, 
-  Trash2, 
+import {
+  MessageCircle,
+  Clock,
+  Sparkles,
+  ChevronLeft,
+  ChevronRight,
+  Edit3,
+  Trash2,
   Building2,
   CheckCircle2,
   Check,
@@ -248,15 +248,13 @@ export function DestinationGrid({
                       top: cat.pos.top,
                       left: cat.pos.left,
                     }}
-                    className={`absolute disc-3d-station ${
-                      isDense
-                        ? 'px-2.5 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-xs max-w-[120px] sm:max-w-[145px]'
-                        : 'px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-[13px] max-w-[135px] sm:max-w-[160px]'
-                    } rounded-full font-bold transition-all duration-300 cursor-pointer whitespace-nowrap z-20 flex items-center gap-1.5 truncate ${
-                      isActive
+                    className={`absolute disc-3d-station ${isDense
+                      ? 'px-2.5 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-xs max-w-[120px] sm:max-w-[145px]'
+                      : 'px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-[13px] max-w-[135px] sm:max-w-[160px]'
+                      } rounded-full font-bold transition-all duration-300 cursor-pointer whitespace-nowrap z-20 flex items-center gap-1.5 truncate ${isActive
                         ? 'bg-white text-slate-950 font-black shadow-[0_0_25px_rgba(255,255,255,0.8)] ring-2 ring-white scale-110'
                         : 'bg-slate-950/85 backdrop-blur-xl text-white hover:bg-white/20 hover:border-white/60 border border-white/35 shadow-xl'
-                    }`}
+                      }`}
                   >
                     <span className="text-sm flex-shrink-0">{cat.emoji}</span>
                     <span className="truncate">{cat.label}</span>
@@ -556,7 +554,7 @@ export function DestinationGrid({
                           className="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200/80 transition-all flex items-center justify-center gap-1.5 cursor-pointer group/btn"
                         >
                           <Eye className="w-3.5 h-3.5 text-slate-600 group-hover/btn:scale-110 transition-transform" />
-                          <span>{language === 'es' ? 'Itinerario' : 'Itinerary'}</span>
+                          <span>{language === 'es' ? 'Informacion' : 'Information'}</span>
                         </button>
 
                         <a
