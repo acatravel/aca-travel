@@ -3,9 +3,9 @@
 
 export const WHATSAPP_CONFIG = {
   // Número internacional sin signos ni espacios (código de país + número)
-  // Ej: República Dominicana es 1809XXXXXXX o 1829XXXXXXX
-  phoneNumber: '18095550199',
-  displayPhone: '+1 (809) 555-0199',
+  // Ej: República Dominicana: '1829XXXXXXX' o '1849XXXXXXX' o '1809XXXXXXX'
+  phoneNumber: (import.meta as any).env?.VITE_WHATSAPP_PHONE || '18494532431',
+  displayPhone: (import.meta as any).env?.VITE_WHATSAPP_DISPLAY_PHONE || '+1 849 453 2431',
   defaultGreeting: '¡Hola equipo ACA Travel! Me gustaría recibir más información sobre sus servicios turísticos.',
 };
 

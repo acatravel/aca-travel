@@ -8,7 +8,7 @@ const rawUrl =
   (import.meta as any).env?.VITE_DATABASE_URL ||
   (import.meta as any).env?.Database_URL ||
   (import.meta as any).env?.DATABASE_URL ||
-  'postgresql://neondb_owner:npg_6qVDnHAyS3Fx@ep-icy-rice-ayqm3rcw-pooler.c-5.us-east-2.aws.neon.tech/neondb?sslmode=require';
+  'postgresql://web_anon:TuPasswordSuperSegura2026%21@ep-icy-rice-ayqm3rcw-pooler.c-5.us-east-2.aws.neon.tech/neondb?sslmode=require';
 
 const connectionString = typeof rawUrl === 'string' ? rawUrl.trim().replace(/^['"]|['"]$/g, '') : rawUrl;
 

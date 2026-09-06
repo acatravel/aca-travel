@@ -8,6 +8,16 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react()],
+    server: {
+      // Prevents directory traversal & serving files outside the project root
+      fs: {
+        strict: true,
+      },
+    },
+    build: {
+      // Prevents leaking original TypeScript source files (.ts, .tsx) in production
+      sourcemap: false,
+    },
     define: {
       'import.meta.env.VITE_DATABASE_URL': JSON.stringify(dbUrl),
       'process.env.DATABASE_URL': JSON.stringify(dbUrl),

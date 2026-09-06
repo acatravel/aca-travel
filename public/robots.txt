@@ -1,0 +1,9 @@
+# Robots.txt for ACA Travel
+# Cybersecurity 2026: Disallow crawling of internal or build artifacts
+User-agent: *
+Disallow: /assets/*.map
+Disallow: /database/
+Disallow: /*.env
+Disallow: /*.sql
+
+Sitemap: /sitemap.xml
